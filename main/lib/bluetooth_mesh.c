@@ -113,10 +113,27 @@ void custom_ibeacon_server_callback(esp_ble_mesh_model_cb_event_t event, esp_ble
             switch (param->model_operation.opcode) {
                 case ESP_BLE_MESH_IBEACON_MODEL_OP_GET:;
                     model_ibeacon_data_t ibeacon_resp = *(model_ibeacon_data_t *) param->model_operation.model->user_data;
-                    esp_log_buffer_hex("UUID: ", ibeacon_resp.uuid, ESP_UUID_LEN_128);
 
+                    // TODO dati ricevuti da beacon e invio al provisoner
+                    // ricevuti
+                    esp_log_buffer_hex("UUID: ", ibeacon_resp.uuid, ESP_UUID_LEN_128);
                     ESP_LOGI(BLUETOOTH_MESH_TAG, "MESH MESSAGE SENT - MAJOR: %hu, MINOR: %d, RSSI: %d distance: %f - Counter #%d - \n",
                              ibeacon_resp.major, ibeacon_resp.minor, ibeacon_resp.rssi, ibeacon_resp.distance, ibeacon_resp.counter);
+
+                    // sovrascrivo per testare il provisoner
+                    uint8_t uuid_1[16] = {0x11, 0x22, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                                  0x00, 0x00, 0x00, 0x00};
+                    memcpy(ibeacon_resp.uuid, uuid_1, sizeof (uuid_1));
+                    esp_log_buffer_hex("UUID SENT1: ", ibeacon_resp.uuid, ESP_UUID_LEN_128);
+                    ibeacon_resp.major = 111;
+                    ibeacon_resp.minor = 222;
+                    ibeacon_resp.rssi = 333;
+                    ibeacon_resp.distance = 444;
+                    ibeacon_resp.counter = 555;
+                    ESP_LOGI(BLUETOOTH_MESH_TAG, "MESH MESSAGE SENT1 - MAJOR: %hu, MINOR: %d, RSSI: %d distance: %f - Counter #%d - \n",
+                             ibeacon_resp.major, ibeacon_resp.minor, ibeacon_resp.rssi, ibeacon_resp.distance, ibeacon_resp.counter);
+
+
                     esp_err_t ib_err = esp_ble_mesh_server_model_send_msg(param->model_operation.model,
                                                                        param->model_operation.ctx,
                                                                        ESP_BLE_MESH_IBEACON_MODEL_OP_STATUS,
@@ -129,7 +146,12 @@ void custom_ibeacon_server_callback(esp_ble_mesh_model_cb_event_t event, esp_ble
                 case ESP_BLE_MESH_IBEACON_MODEL_OP_BEACON:;
                     int rssi = param->model_operation.ctx->recv_rssi;
                     model_ibeacon_data_t ibeaconData = *(model_ibeacon_data_t *) param->model_operation.model->user_data;
-                    update_ibeacon_state(ibeaconData.uuid, ibeaconData.major, ibeaconData.minor,rssi);
+                    /* TODO qui dovrebbe ricevere il segnale ma stampa 0 a uuid, major e minor
+                     * mentre rssi funziona (lo calcola il server però)
+                    */
+                    esp_log_buffer_hex("VVVVVVVV: ", ibeaconData.uuid, 16);
+                    ESP_LOGI("VVVVVVVVVV", "%d %d", ibeaconData.major, ibeaconData.minor);
+                    update_ibeacon_state(ibeaconData.uuid, ibeaconData.major, ibeaconData.minor, rssi);
                 break;
                 default:
                     break;
@@ -151,6 +173,7 @@ void update_ibeacon_state(uint8_t *uuid, uint16_t major, uint16_t minor, int rss
     double envFactor = 4.6;
 
     memcpy(_ibeacon_model_state.uuid, uuid, 16);
+    // esp_log_buffer_hex("ZZZZZZZZZ: ", _ibeacon_model_state.uuid, ESP_UUID_LEN_128);
     _ibeacon_model_state.major = major;
     _ibeacon_model_state.minor = minor;
     _ibeacon_model_state.rssi = rssi;
