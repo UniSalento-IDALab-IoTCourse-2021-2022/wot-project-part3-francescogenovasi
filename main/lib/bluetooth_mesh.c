@@ -142,9 +142,9 @@ void custom_ibeacon_server_callback(esp_ble_mesh_model_cb_event_t event, esp_ble
 
                     // TODO dati ricevuti da beacon e invio al provisoner
                     // ricevuti
-                    esp_log_buffer_hex("UUID: ", ibeacon_resp.uuid, ESP_UUID_LEN_128);
+                    /* TODO commento calibrazione esp_log_buffer_hex("UUID: ", ibeacon_resp.uuid, ESP_UUID_LEN_128);
                     ESP_LOGI(BLUETOOTH_MESH_TAG, "MESH MESSAGE SENT - MAJOR: %hu, MINOR: %d, RSSI: %d distance: %f - Counter #%d - \n",
-                             ibeacon_resp.major, ibeacon_resp.minor, ibeacon_resp.rssi, ibeacon_resp.distance, ibeacon_resp.counter);
+                             ibeacon_resp.major, ibeacon_resp.minor, ibeacon_resp.rssi, ibeacon_resp.distance, ibeacon_resp.counter); */
 
                     // TODO modificato da noi sovrascrivo per testare il provisoner
                     /* uint8_t uuid_1[16] = {0x11, 0x22, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -159,15 +159,16 @@ void custom_ibeacon_server_callback(esp_ble_mesh_model_cb_event_t event, esp_ble
                     ESP_LOGI(BLUETOOTH_MESH_TAG, "MESH MESSAGE SENT1 - MAJOR: %hu, MINOR: %d, RSSI: %d distance: %f - Counter #%d - \n",
                              ibeacon_resp.major, ibeacon_resp.minor, ibeacon_resp.rssi, ibeacon_resp.distance, ibeacon_resp.counter);*/
 
-
+                    ESP_LOGI("", "RSSI: %d", ibeacon_resp.rssi);
 
                     esp_err_t ib_err = esp_ble_mesh_server_model_send_msg(param->model_operation.model,
                                                                        param->model_operation.ctx,
                                                                        ESP_BLE_MESH_IBEACON_MODEL_OP_STATUS,
                                                                        sizeof(ibeacon_resp), (uint8_t *) &ibeacon_resp);
                     if (ib_err) {
+                        /* TODO commento calibrazione
                         ESP_LOGE(BLUETOOTH_MESH_TAG, "Failed to send message 0x%06x",
-                                 ESP_BLE_MESH_IBEACON_MODEL_OP_STATUS);
+                                 ESP_BLE_MESH_IBEACON_MODEL_OP_STATUS);*/
                     }
                     break;
                 case ESP_BLE_MESH_IBEACON_MODEL_OP_BEACON:;
